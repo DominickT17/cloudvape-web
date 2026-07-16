@@ -6,6 +6,7 @@ const link = buildWhatsappLink('Hola CloudVape, deseo consultar disponibilidad d
 
 function WhatsAppButton() {
   const [isNearFooter, setIsNearFooter] = useState(false);
+  const [isOverHero, setIsOverHero] = useState(false);
 
   useEffect(() => {
     const footer = document.querySelector('footer');
@@ -23,9 +24,25 @@ function WhatsAppButton() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const hero = document.querySelector('.hero-section');
+
+    if (!hero) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsOverHero(entry.isIntersecting),
+      { threshold: 0.18 },
+    );
+
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <a
-      className={`floating-whatsapp ${isNearFooter ? 'is-near-footer' : ''}`}
+      className={`floating-whatsapp ${isNearFooter ? 'is-near-footer' : ''} ${isOverHero ? 'is-over-hero' : ''}`}
       href={link}
       target="_blank"
       rel="noreferrer"

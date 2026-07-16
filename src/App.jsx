@@ -24,9 +24,9 @@ function App() {
         <SectionDivider tone="cyan" />
         <Products />
         <SectionDivider tone="magenta" />
-        <Comparison />
-        <SectionDivider tone="cyan" />
         <Flavors />
+        <SectionDivider tone="cyan" />
+        <Comparison />
         <SectionDivider tone="magenta" />
         <Delivery />
         <SectionDivider tone="cyan" />

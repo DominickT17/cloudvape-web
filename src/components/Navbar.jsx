@@ -5,8 +5,8 @@ import { buildWhatsappLink } from '../data/products.js';
 const navItems = [
   { label: 'Inicio', href: '#inicio' },
   { label: 'Productos', href: '#productos' },
+  { label: 'Disponibilidad', href: '#disponibilidad' },
   { label: 'Comparativa', href: '#comparativa' },
-  { label: 'Sabores', href: '#sabores' },
   { label: 'Entregas', href: '#entregas' },
   { label: 'Catálogo', href: '#catalogo-digital' },
   { label: 'FAQ', href: '#faq' },

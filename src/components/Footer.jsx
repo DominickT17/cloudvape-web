@@ -4,8 +4,8 @@ import { buildWhatsappLink, whatsappNumber } from '../data/products.js';
 const footerLinks = [
   ['Inicio', '#inicio'],
   ['Productos', '#productos'],
+  ['Disponibilidad', '#disponibilidad'],
   ['Comparativa', '#comparativa'],
-  ['Sabores', '#sabores'],
   ['Entregas', '#entregas'],
   ['Catálogo digital', '#catalogo-digital'],
   ['Cómo pedir', '#como-pedir'],

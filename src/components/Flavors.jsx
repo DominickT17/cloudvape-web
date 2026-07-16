@@ -1,103 +1,160 @@
 import { useMemo, useState } from 'react';
-import { Search, Sparkles } from 'lucide-react';
-import FlavorChip from './FlavorChip.jsx';
+import { Eye, MessageCircle, PackageCheck, Search } from 'lucide-react';
+import FlavorModal from './FlavorModal.jsx';
+import ProductImage from './ProductImage.jsx';
 import SectionHeader from './SectionHeader.jsx';
-import { products } from '../data/products.js';
+import { buildFlavorWhatsappLink, formatPrice, inventory, products } from '../data/products.js';
 
-const allProductsFilter = 'todos';
+const filters = [
+  { id: 'todos', label: 'Todos' },
+  { id: 'maskking-extre-100k', label: 'Maskking' },
+  { id: 'waka-sopro-15k', label: 'WAKA' },
+  { id: 'nasty-bar-2k', label: 'Nasty' },
+  { id: 'frutal', label: 'Sabores frutales' },
+  { id: 'fresco', label: 'Sabores frescos o mentolados' },
+];
+
+function getProduct(item) {
+  return products.find((product) => product.id === item.productId);
+}
 
 function Flavors() {
   const [query, setQuery] = useState('');
-  const [activeProduct, setActiveProduct] = useState(allProductsFilter);
+  const [activeFilter, setActiveFilter] = useState('todos');
+  const [selectedFlavor, setSelectedFlavor] = useState(null);
 
-  const filteredProducts = useMemo(() => {
+  const filteredInventory = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return products
-      .filter((product) => activeProduct === allProductsFilter || product.id === activeProduct)
-      .map((product) => ({
-        ...product,
-        visibleFlavors: product.flavors.filter((flavor) => flavor.toLowerCase().includes(normalizedQuery)),
-      }))
-      .filter((product) => product.visibleFlavors.length > 0);
-  }, [activeProduct, query]);
+    return inventory.filter((item) => {
+      const product = getProduct(item);
+      const matchesQuery = [item.brand, item.model, item.flavor]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalizedQuery);
+      const matchesFilter =
+        activeFilter === 'todos' ||
+        item.productId === activeFilter ||
+        item.filterTags.includes(activeFilter);
+
+      return matchesQuery && matchesFilter;
+    });
+  }, [activeFilter, query]);
 
   return (
-    <section id="sabores" className="scene scene-d flavors-section">
+    <section id="disponibilidad" className="scene scene-d flavors-section">
       <div className="section-shell section-shell--wide">
-        <div className="flavors-layout">
-          <div className="flavors-intro">
-            <SectionHeader
-              kicker="Sabores"
-              title="Sabores por línea, listos para explorar"
-              copy="Busca una nota específica o cambia de producto sin perder el ritmo de navegación."
+        <div className="availability-heading-row">
+          <SectionHeader
+            kicker="Disponibilidad"
+            title="Sabores disponibles ahora"
+            copy="Estas son las opciones actualmente disponibles. El inventario puede cambiar; confirma existencias antes de realizar tu pedido."
+          />
+          <label className="flavor-search">
+            <Search aria-hidden="true" size={19} />
+            <span className="sr-only">Buscar sabor</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar sabor, marca o modelo..."
             />
+          </label>
+        </div>
 
-            <div className="flavor-controls">
-              <label className="flavor-search">
-                <Search aria-hidden="true" size={19} />
-                <span className="sr-only">Buscar sabor</span>
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Buscar sabor..."
-                />
-              </label>
-              <div className="flavor-filters" aria-label="Filtrar sabores por producto">
-                <button type="button" className={activeProduct === allProductsFilter ? 'is-selected' : ''} onClick={() => setActiveProduct(allProductsFilter)}>
-                  Todos
-                </button>
-                {products.map((product) => (
-                  <button
-                    key={product.id}
-                    type="button"
-                    className={activeProduct === product.id ? 'is-selected' : ''}
-                    onClick={() => setActiveProduct(product.id)}
-                    style={{ '--accent': product.accent.primary, '--accent-soft': product.accent.soft }}
-                  >
-                    {product.shortName}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <p className="availability-note">
-              Sabores sujetos a disponibilidad. Confirma existencias antes de realizar tu pedido.
-            </p>
-          </div>
-
-          <div className="flavor-lanes">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <article
-                  key={product.id}
-                  className="flavor-lane reveal-up"
-                  style={{ '--accent': product.accent.primary, '--accent-soft': product.accent.soft }}
-                >
-                  <div className="flavor-lane__head">
-                    <span>
-                      <Sparkles aria-hidden="true" size={18} />
-                    </span>
-                    <div>
-                      <p>{product.category}</p>
-                      <h3>{product.name}</h3>
-                    </div>
-                  </div>
-                  <div className="flavor-strip" tabIndex={0} aria-label={`Sabores de ${product.shortName}`}>
-                    {product.visibleFlavors.map((flavor) => (
-                      <FlavorChip key={flavor} flavor={flavor} />
-                    ))}
-                  </div>
-                </article>
-              ))
-            ) : (
-              <div className="flavors-empty">
-                No encontramos sabores que coincidan con tu búsqueda.
-              </div>
-            )}
+        <div className="flavor-controls">
+          <div className="flavor-filters" aria-label="Filtrar sabores disponibles">
+            {filters.map((filter) => (
+              <button
+                key={filter.id}
+                type="button"
+                className={activeFilter === filter.id ? 'is-selected' : ''}
+                onClick={() => setActiveFilter(filter.id)}
+              >
+                {filter.label}
+              </button>
+            ))}
           </div>
         </div>
+
+        {filteredInventory.length > 0 ? (
+          <div className="availability-grid">
+            {filteredInventory.map((item) => {
+              const product = getProduct(item);
+              const isAvailable = item.stock > 0;
+              const orderLink = buildFlavorWhatsappLink(item);
+
+              return (
+                <article
+                  key={item.id}
+                  className={`availability-card reveal-up ${isAvailable ? '' : 'is-sold-out'}`}
+                  style={{
+                    '--accent': item.accent.primary,
+                    '--accent-2': item.accent.secondary,
+                    '--accent-soft': product.accent.soft,
+                    '--accent-glow': product.accent.glow,
+                  }}
+                >
+                  <button
+                    className="availability-card__image"
+                    type="button"
+                    onClick={() => setSelectedFlavor(item)}
+                    aria-label={`Ver imagen de ${item.model} sabor ${item.flavor}`}
+                  >
+                    <ProductImage
+                      item={item}
+                      sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 92vw"
+                    />
+                  </button>
+
+                  <div className="availability-card__body">
+                    <div className="availability-card__topline">
+                      <span>{item.brand}</span>
+                      <strong className={isAvailable ? 'is-available' : 'is-sold-out'}>
+                        {isAvailable ? 'Disponible' : 'Agotado'}
+                      </strong>
+                    </div>
+                    <h3>{item.flavor}</h3>
+                    <p>{item.model}</p>
+
+                    <div className="availability-card__meta">
+                      <span>{formatPrice(item.price)}</span>
+                      <span>
+                        <PackageCheck aria-hidden="true" size={16} />
+                        {item.stock} unidades
+                      </span>
+                    </div>
+
+                    <div className="availability-card__actions">
+                      {isAvailable ? (
+                        <a className="btn-primary" href={orderLink} target="_blank" rel="noreferrer">
+                          <MessageCircle aria-hidden="true" size={18} />
+                          Pedir este sabor
+                        </a>
+                      ) : (
+                        <button className="btn-primary" type="button" disabled>
+                          Agotado
+                        </button>
+                      )}
+                      <button className="btn-secondary" type="button" onClick={() => setSelectedFlavor(item)}>
+                        <Eye aria-hidden="true" size={18} />
+                        Ver imagen
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flavors-empty">
+            No encontramos sabores que coincidan con tu búsqueda.
+          </div>
+        )}
+
+        {selectedFlavor && (
+          <FlavorModal item={selectedFlavor} onClose={() => setSelectedFlavor(null)} />
+        )}
       </div>
     </section>
   );

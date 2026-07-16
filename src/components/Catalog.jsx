@@ -57,6 +57,10 @@ function Catalog() {
           align="center"
         />
 
+        <p className="catalog-availability-note">
+          El catálogo presenta información general de los modelos. Para conocer los sabores disponibles actualmente, revisa la sección Disponibilidad.
+        </p>
+
         <div className="catalog-viewer">
           <div className="catalog-main">
             <button className="catalog-nav catalog-prev" type="button" onClick={showPrevious} aria-label="Lámina anterior">

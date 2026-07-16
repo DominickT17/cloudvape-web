@@ -9,6 +9,7 @@ const deliveryAreas = [
     tone: 'cyan',
     icon: MapPin,
     summary: 'Entrega coordinada dentro de zonas específicas.',
+    cta: 'Coordinar en Xela',
     details: [
       'Zonas 1, 3 y 10.',
       'Centros comerciales.',
@@ -22,6 +23,7 @@ const deliveryAreas = [
     tone: 'magenta',
     icon: CalendarDays,
     summary: 'Pedidos con anticipación para entrega de fin de semana.',
+    cta: 'Reservar fin de semana',
     details: [
       'Entregas únicamente fines de semana.',
       'Requiere pedido anticipado.',
@@ -30,7 +32,9 @@ const deliveryAreas = [
 ];
 
 const detailIcons = [Truck, GraduationCap, CalendarDays, MapPin, Route];
-const deliveryLink = buildWhatsappLink('Hola CloudVape, deseo coordinar una entrega.');
+function deliveryLink(city) {
+  return buildWhatsappLink(`Hola CloudVape, deseo coordinar una entrega en ${city}.`);
+}
 
 function Delivery() {
   return (
@@ -80,12 +84,10 @@ function Delivery() {
                     );
                   })}
                 </ul>
-                {area.city === 'Huehuetenango' && (
-                  <a className="btn-secondary delivery-reserve" href={deliveryLink} target="_blank" rel="noreferrer">
-                    <MessageCircle aria-hidden="true" size={17} />
-                    Reservar con anticipación
-                  </a>
-                )}
+                <a className="btn-secondary delivery-reserve" href={deliveryLink(area.city)} target="_blank" rel="noreferrer">
+                  <MessageCircle aria-hidden="true" size={17} />
+                  {area.cta}
+                </a>
               </GlowCard>
             );
           })}

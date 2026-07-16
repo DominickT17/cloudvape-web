@@ -1,4 +1,5 @@
-import { BatteryCharging, CheckCircle2, Gauge, MinusCircle, Monitor, Sparkles, Zap } from 'lucide-react';
+import { BatteryCharging, CheckCircle2, Gauge, MinusCircle, Monitor, PackageCheck, Sparkles, Zap } from 'lucide-react';
+import ProductImage from './ProductImage.jsx';
 import SectionHeader from './SectionHeader.jsx';
 import { products } from '../data/products.js';
 
@@ -11,6 +12,7 @@ const idealFor = {
 const desktopColumns = [
   ['Modelo', 'name', Sparkles],
   ['Precio', 'priceLabel', Zap],
+  ['Unidades disponibles', 'stockTotal', PackageCheck],
   ['Puffs', 'puffs', Gauge],
   ['Recarga', 'rechargeable', BatteryCharging],
   ['Pantalla', 'display', Monitor],
@@ -20,6 +22,7 @@ const desktopColumns = [
 
 const mobileColumns = [
   ['Precio', 'priceLabel', Zap],
+  ['Unidades disponibles', 'stockTotal', PackageCheck],
   ['Puffs', 'puffs', Gauge],
   ['Batería', 'battery', BatteryCharging],
   ['Pantalla', 'display', Monitor],
@@ -77,10 +80,12 @@ function Comparison() {
                     <td key={`${product.id}-${key}`} data-label={label}>
                       {key === 'priceLabel' ? (
                         <span className="comparison-price">{product[key]}</span>
+                      ) : key === 'stockTotal' ? (
+                        <ValueWithIcon value={`${product[key]} unidades`} icon={Icon} />
                       ) : key === 'name' ? (
                         <span className="comparison-product">
                           <span>
-                            <img src={product.image} alt={product.imageAlt} loading="lazy" />
+                            <ProductImage item={product} />
                           </span>
                           <strong>{product.shortName}</strong>
                         </span>
@@ -103,7 +108,7 @@ function Comparison() {
               style={{ '--accent': product.accent.primary, '--accent-soft': product.accent.soft }}
             >
               <div className="comparison-mobile-card__head">
-                <img src={product.image} alt={product.imageAlt} loading="lazy" />
+                <ProductImage item={product} />
                 <div>
                   <p>{product.category}</p>
                   <h3>{product.shortName}</h3>
@@ -117,7 +122,7 @@ function Comparison() {
                       <Icon aria-hidden="true" size={15} />
                       {label}
                     </dt>
-                    <dd>{product[key]}</dd>
+                    <dd>{key === 'stockTotal' ? `${product[key]} unidades` : product[key]}</dd>
                   </div>
                 ))}
               </dl>

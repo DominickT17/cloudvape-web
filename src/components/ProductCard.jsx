@@ -1,10 +1,8 @@
-import { BatteryCharging, Eye, Gauge, Info, MessageCircle, Monitor, ShieldCheck, Zap } from 'lucide-react';
-import ProductFeature from './ProductFeature.jsx';
+import { ArrowDown, MessageCircle, PackageCheck, Sparkles } from 'lucide-react';
+import ProductImage from './ProductImage.jsx';
 import { buildWhatsappLink } from '../data/products.js';
 
-const featureIcons = [Gauge, BatteryCharging, Monitor, Zap, ShieldCheck, Info];
-
-function ProductCard({ product, onViewDetails, variant = 'standard' }) {
+function ProductCard({ product }) {
   const orderLink = buildWhatsappLink(product.whatsappMessage);
   const accentStyle = {
     '--accent': product.accent.primary,
@@ -14,42 +12,50 @@ function ProductCard({ product, onViewDetails, variant = 'standard' }) {
   };
 
   return (
-    <article className={`product-card product-card--${variant} reveal-up`} style={accentStyle}>
+    <article className="product-card reveal-up" style={accentStyle}>
       <div className="product-visual">
-        <div className="product-visual__halo" aria-hidden="true" />
+        <span className="product-visual__halo" aria-hidden="true" />
         <span className="product-photo-frame">
-          <img className="product-image" src={product.image} alt={product.imageAlt} loading="lazy" />
+          <ProductImage
+            item={product}
+            className="product-image"
+            sizes="(min-width: 1024px) 28vw, 90vw"
+          />
         </span>
-        <div className="product-visual__reflection" aria-hidden="true" />
       </div>
 
       <div className="product-card-body">
         <p className="product-category">{product.category}</p>
-        <div className="product-title-row">
-          <div>
-            <h3>{product.name}</h3>
-            <p>{product.description}</p>
-          </div>
-          <p className="price-chip">{product.priceLabel}</p>
+        <h3>{product.name}</h3>
+        <p className="product-description">{product.description}</p>
+
+        <div className="product-stock-row" aria-label={`Disponibilidad de ${product.shortName}`}>
+          <span className="price-chip">{product.priceLabel}</span>
+          <span>
+            <PackageCheck aria-hidden="true" size={17} />
+            {product.stockTotal} unidades
+          </span>
+          <span>
+            <Sparkles aria-hidden="true" size={17} />
+            {product.flavorCount} sabores
+          </span>
         </div>
 
         <ul className="product-feature-list">
-          {product.highlights.slice(0, 3).map((feature, index) => (
-            <ProductFeature key={feature} icon={featureIcons[index] || Info}>
-              {feature}
-            </ProductFeature>
+          {product.highlights.slice(0, 3).map((feature) => (
+            <li key={feature}>{feature}</li>
           ))}
         </ul>
 
         <div className="product-actions">
+          <a className="btn-secondary" href="#disponibilidad">
+            <ArrowDown aria-hidden="true" size={18} />
+            Explorar sabores
+          </a>
           <a className="btn-primary" href={orderLink} target="_blank" rel="noreferrer">
             <MessageCircle aria-hidden="true" size={18} />
             Pedir por WhatsApp
           </a>
-          <button className="btn-secondary" type="button" onClick={onViewDetails}>
-            <Eye aria-hidden="true" size={18} />
-            Ver detalles
-          </button>
         </div>
       </div>
     </article>
